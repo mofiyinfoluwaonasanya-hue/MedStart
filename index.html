@@ -3548,7 +3548,7 @@ const ACCESS = {
 
 function requestLinks(){
   const wa = `https://wa.me/${ACCESS.WHATSAPP}?text=${encodeURIComponent(ACCESS.REQUEST_MESSAGE)}`;
-  const mail = `mailto:${ACCESS.EMAIL}?subject=${encodeURIComponent('MEDSTART access code request')}&body=${encodeURIComponent(ACCESS.REQUEST_MESSAGE)}`;
+  const mail = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(ACCESS.EMAIL)}&su=${encodeURIComponent('MEDSTART access code request')}&body=${encodeURIComponent(ACCESS.REQUEST_MESSAGE)}`;
   return {wa, mail};
 }
 
@@ -3871,7 +3871,7 @@ function renderActivate(){
         Access codes are issued personally. Message me to request yours and I'll send it to you directly.
         <div class="request-row">
           <a href="${links.wa}" target="_blank" rel="noopener">Request on WhatsApp</a>
-          <a class="alt" href="${links.mail}">Request by Email</a>
+          <a class="alt" href="${links.mail}" target="_blank" rel="noopener">Request by Email</a>
         </div>
       </div>
       <div style="text-align:center"><span class="auth-lock">🔒 One code per student</span></div>
