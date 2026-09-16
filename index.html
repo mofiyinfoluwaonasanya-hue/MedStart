@@ -3513,60 +3513,34 @@ function loadState(){
 function saveState(){ localStorage.setItem(STORE_KEY, JSON.stringify(STATE)); }
 
 /* =========================================================
-   ACCESS CODES  —  everything lives in this one file
+   ACCESS CONFIGURATION
    ---------------------------------------------------------
-   CODES_POOL below is a batch of 200 ready-made access codes.
-   Every one of them will unlock MEDSTART for a student. Your
-   job is just to hand a code out to one buyer at a time.
-
-   Use the Admin panel (a small link at the very bottom of the
-   homepage) to keep track of who has which code — open the
-   site, scroll to the footer, tap "Admin", and enter your
-   admin password (set just below).
-
-   Running low on codes? Come back to this conversation and
-   ask for another batch — it takes a few seconds to add more.
+   Codes are no longer stored in this file at all — they live
+   in your Google Sheet (MedstartServer.gs) and are checked
+   over the network. This means a student needs internet the
+   moment they log in, but nothing about your codes can be
+   found by viewing this page's source.
    ========================================================= */
-const CODES_POOL = [
-  "MED-22T3-LEZK", "MED-28VG-3PBM", "MED-2D26-WLJG", "MED-2H53-V99Y", "MED-2L3C-QELC", "MED-3FLF-EVXU", "MED-3FQB-4QYF", "MED-3H7M-VCUC",
-  "MED-3RX6-FLK3", "MED-468S-X8G5", "MED-4B3T-9JGQ", "MED-4FH4-TEFU", "MED-4LVS-3Y77", "MED-568L-6YJ4", "MED-5B25-3CZQ", "MED-5GC8-8ME4",
-  "MED-5S4Q-UTZP", "MED-5V8Y-CFNE", "MED-5YM6-PW8G", "MED-6BD6-UKEY", "MED-6CS8-SZAX", "MED-6FQK-3UTG", "MED-6MP9-PDGD", "MED-6ZJC-SJ37",
-  "MED-738X-YTLN", "MED-75WH-RYVW", "MED-793Q-EDEE", "MED-7DFT-3BD7", "MED-7E8P-T9XJ", "MED-7Q8N-N6CL", "MED-7SCN-NHML", "MED-7V5S-FE7W",
-  "MED-8R44-2N6Y", "MED-8TKZ-ENPW", "MED-8UCT-GJZH", "MED-8Y87-8C43", "MED-96XW-TJJQ", "MED-9B9Q-DNH7", "MED-9F8N-ZH3W", "MED-9MV2-3L7E",
-  "MED-9N8G-N9UW", "MED-9SXX-ZY6D", "MED-9WF4-32UT", "MED-9Z7W-P479", "MED-A3Q3-DHQL", "MED-A8N7-JEYD", "MED-AAQ2-YJA4", "MED-ABVH-RR7Y",
-  "MED-AC2S-GWZZ", "MED-AP9A-HXRZ", "MED-AUDD-29NP", "MED-B6Q3-L88E", "MED-BBVQ-TB65", "MED-BFBS-F7E8", "MED-BG55-88PV", "MED-BGFX-P963",
-  "MED-BJLH-WTU9", "MED-BJV4-RPR4", "MED-BSMD-B9XE", "MED-BWXQ-JMN9", "MED-BZFC-FZKD", "MED-C4FP-KCMS", "MED-C86W-JAWU", "MED-C9UD-A3XU",
-  "MED-CS9P-H9E9", "MED-DBC5-3JU6", "MED-DDQF-B44D", "MED-DGT6-97C8", "MED-DQ2M-S7YG", "MED-DVLK-XZ4D", "MED-EGWD-YKG6", "MED-EK3S-9UJG",
-  "MED-EKDZ-PLP7", "MED-ERJD-RL2R", "MED-EUY8-QALW", "MED-EWUP-3XTW", "MED-EXA3-ZPJ8", "MED-F326-MCQB", "MED-F8TD-DCEE", "MED-FC77-3JU8",
-  "MED-FCRC-6N7N", "MED-FFEL-W32D", "MED-FFWP-5WV2", "MED-FHHB-FYQ6", "MED-FHSR-S2RR", "MED-FMSQ-XQ3Z", "MED-FNJG-LUVY", "MED-FQHE-UYAG",
-  "MED-FYX6-ZQFA", "MED-G57K-44VG", "MED-G6YZ-UG45", "MED-GJS9-G7H3", "MED-GJVC-3R29", "MED-GR8J-RWER", "MED-GV9C-PPF6", "MED-H3XQ-3MWH",
-  "MED-H4WT-8JE9", "MED-H7UH-EMZF", "MED-HD7G-VT5Q", "MED-HP6E-WDJV", "MED-HZY4-6TDB", "MED-J2GZ-F2LS", "MED-J5SU-RTF5", "MED-J6V5-94MU",
-  "MED-J76Z-E579", "MED-JLCE-Z3UC", "MED-KMW3-2CNY", "MED-KMXT-GGZP", "MED-KRW4-482P", "MED-KSAC-M6VZ", "MED-KW4P-ZLT8", "MED-L7QF-B9XK",
-  "MED-LAGM-HVQF", "MED-LB4Z-NMNU", "MED-LM3C-YKZV", "MED-M5MC-XGEG", "MED-MAEL-G4Z8", "MED-MEAN-74HH", "MED-MK4H-QRU6", "MED-MQDL-99LD",
-  "MED-N2GK-Y5DH", "MED-N3PH-RXMY", "MED-NA2B-HB4U", "MED-NNL2-U77V", "MED-NUS4-M2QN", "MED-NUZM-7VHZ", "MED-NZKP-APW7", "MED-PENM-FPHP",
-  "MED-PFX2-HB3E", "MED-PNQ3-MAZ3", "MED-PUG2-RD5H", "MED-PUS8-WJXK", "MED-Q9DL-KRFQ", "MED-QC7F-RTM8", "MED-QFCT-6V3M", "MED-QG45-DFRJ",
-  "MED-QHQN-Z6HU", "MED-R2K3-H5WV", "MED-R2RR-S4YS", "MED-R6CZ-KVDR", "MED-R9AE-D5ER", "MED-RA4V-T6DA", "MED-RBGH-TLWJ", "MED-RCRL-QFU7",
-  "MED-RQ6L-VSNL", "MED-RV87-PYKP", "MED-SKFX-L7AR", "MED-SZ3Z-WWVR", "MED-T2JY-7QBU", "MED-T7FW-UWAT", "MED-T8QA-HNY6", "MED-TA2W-6Z4B",
-  "MED-TBUV-LX67", "MED-TPNJ-EKKK", "MED-TSM7-VUST", "MED-TUF2-CMAU", "MED-TVPY-MN28", "MED-U6AV-8SQN", "MED-U6XA-ZB62", "MED-UBE4-A7EL",
-  "MED-UCFQ-YTTT", "MED-UGRK-K4CG", "MED-UJ66-5U7C", "MED-ULNB-Q433", "MED-UMA2-DQW2", "MED-UU5Z-F6Q9", "MED-V4JN-PQ77", "MED-V5AU-NWW2",
-  "MED-VAQJ-MKAF", "MED-VFB3-ZXB4", "MED-VJPY-2E4N", "MED-VL4Y-G7DS", "MED-VPDY-MLJ5", "MED-VTRW-JD56", "MED-VUHX-WWSN", "MED-VX3J-ZENZ",
-  "MED-W89R-2PJZ", "MED-WCNA-28EL", "MED-WQNJ-VBMW", "MED-WRYS-HQZZ", "MED-WTUW-VSNB", "MED-WXJV-6A8L", "MED-WYWF-CJ34", "MED-XCTD-J79B",
-  "MED-XDAQ-LNS3", "MED-XF7K-VR2R", "MED-XKVN-ESTH", "MED-XVWK-FEJR", "MED-YE7J-TGMF", "MED-YJ6W-ZZ9E", "MED-YMJJ-MEA7", "MED-YSQ6-J37T",
-  "MED-YVE2-XUSX", "MED-Z72X-AYSU", "MED-Z97A-R4SA", "MED-ZGRT-6AVA", "MED-ZKB4-GPKR", "MED-ZLD9-H3AJ", "MED-ZQAY-K92W", "MED-ZWGM-Q3XL",
-];
 
-/* Change this to your own password. This only gates the
-   admin panel from casual visitors — keep the admin link
-   to yourself. */
+/* Change this to your own password. It gates the admin panel
+   AND is sent to your Google Sheet to prove admin actions are
+   really from you — keep the admin link and this password
+   private, and make sure this matches ADMIN_SECRET in your
+   MedstartServer.gs exactly. */
 const ADMIN_PASSWORD = "AuroraMeadow8072%";
+
+/* Paste your Apps Script web app URL here — same one used for
+   the admin panel. It looks like:
+   https://script.google.com/macros/s/AKfycb.../exec */
+const ADMIN_SHEET_URL = "https://script.google.com/macros/s/AKfycbzaEPm7bUyGpMUqQP-Hnkx6rP1H7Juw-VQR3k3bl7WpMr1wslEPOCXcufP_dpjFRPD0/exec";
 
 const ACCESS = {
   /* Your WhatsApp number in international format, digits only,
      no plus sign and no spaces. Example: 2348012345678 */
-  WHATSAPP: "2348000000000",
+  WHATSAPP: "2348110759305",
 
   /* Your email address for code requests */
-  EMAIL: "you@example.com",
+  EMAIL: "mofiyinfoluwaonasanya@gmail.com",
 
   /* Message pre-filled when a student taps Request Access */
   REQUEST_MESSAGE: "Hello, I would like to request a MEDSTART access code."
@@ -3888,7 +3862,7 @@ function renderActivate(){
             <svg id="eyeIconHide" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="hide"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-7 0-11-7-11-7a21.4 21.4 0 0 1 5.06-5.94M9.9 4.24A10.5 10.5 0 0 1 12 4c7 0 11 7 11 7a21.3 21.3 0 0 1-2.16 3.19M14.12 14.12a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
           </button>
         </div>
-        <div class="hint">Case doesn't matter — type it exactly as you received it.</div>
+        <div class="hint">Case doesn't matter. You'll need internet for this one step — after that MEDSTART works offline.</div>
       </div>
       <button class="btn btn-dark btn-full" id="activateBtn">Unlock MEDSTART</button>
       <div class="auth-links"><button data-nav="dashboard-continue">Already unlocked? Continue learning</button></div>
@@ -3906,20 +3880,42 @@ function renderActivate(){
   </div>`;
 }
 
-function tryActivate(){
+let __unlocking = false;
+async function tryActivate(){
+  if(__unlocking) return;
   const name = document.getElementById('stuName').value.trim();
   const code = document.getElementById('stuCode').value.trim().toUpperCase();
   const errBox = document.getElementById('activateErr');
+  const btn = document.getElementById('activateBtn');
 
   if(!name){ errBox.innerHTML = `<div class="err-msg">Please enter your name.</div>`; return; }
   if(name.length < 2){ errBox.innerHTML = `<div class="err-msg">Please enter your full name.</div>`; return; }
   if(!code){ errBox.innerHTML = `<div class="err-msg">Please enter your access code.</div>`; return; }
 
-  const valid = CODES_POOL.includes(code);
+  __unlocking = true;
+  if(btn){ btn.disabled = true; btn.textContent = 'Checking…'; }
 
-  if(!valid){
+  let result = null;
+  try{
+    const url = `${ADMIN_SHEET_URL}?action=verify&code=${encodeURIComponent(code)}&name=${encodeURIComponent(name)}`;
+    const res = await fetch(url);
+    result = await res.json();
+  }catch(e){
+    errBox.innerHTML = `<div class="err-msg">Couldn't reach the access server. Check your internet connection and try again — you only need internet for this one step.</div>`;
+    __unlocking = false;
+    if(btn){ btn.disabled = false; btn.textContent = 'Unlock MEDSTART'; }
+    return;
+  }
+
+  __unlocking = false;
+  if(btn){ btn.disabled = false; btn.textContent = 'Unlock MEDSTART'; }
+
+  if(!result || !result.ok){
     const links = requestLinks();
-    errBox.innerHTML = `<div class="err-msg">That access code isn't valid. Check it carefully, or <a href="${links.wa}" target="_blank" rel="noopener" style="text-decoration:underline;font-weight:600;color:inherit">request a code</a>.</div>`;
+    const reason = result && result.error === 'revoked'
+      ? 'This access code has been deactivated.'
+      : "That access code isn't valid.";
+    errBox.innerHTML = `<div class="err-msg">${reason} Check it carefully, or <a href="${links.wa}" target="_blank" rel="noopener" style="text-decoration:underline;font-weight:600;color:inherit">request a code</a>.</div>`;
     const input = document.getElementById('stuCode');
     if(input){ input.value = ''; input.focus(); }
     return;
@@ -3935,22 +3931,90 @@ function tryActivate(){
 /* =========================================================
    ADMIN PANEL
    ---------------------------------------------------------
-   Keeps track of which buyer has which code. This record is
-   saved in THIS browser only (localStorage) — it's your own
-   private notepad, not something that syncs anywhere. The
-   codes themselves (CODES_POOL above) work for any student
-   regardless of what's noted here; this list just helps you
-   remember who you've given a code to.
+   Keeps track of which buyer has which code. This is synced
+   through a small Google Sheet (see AdminSync.gs) so the same
+   list shows up whether you check it from your phone, your
+   laptop, or anywhere else. The 200 codes themselves work for
+   any student regardless of what's noted here — this list
+   just helps you remember who you've given a code to.
+
+   Paste your MedstartServer.gs web app URL below. It looks
+   like: https://script.google.com/macros/s/AKfycb.../exec
    ========================================================= */
-const ADMIN_KEY = "medstart_admin_log_v1";
+
 let adminUnlocked = false;
 let adminSearch = "";
+let adminLogCache = null;   // null = not loaded yet from the sheet; array of {code,name,status,timesUsed}
+let adminLoading = false;
+let adminLoadError = null;
+let adminGenerating = false;
 
-function loadAdminLog(){
-  try{ return JSON.parse(localStorage.getItem(ADMIN_KEY)) || {}; }
-  catch(e){ return {}; }
+function adminConfigured(){
+  return typeof ADMIN_SHEET_URL === "string" && ADMIN_SHEET_URL.startsWith("http");
 }
-function saveAdminLog(log){ localStorage.setItem(ADMIN_KEY, JSON.stringify(log)); }
+
+async function fetchAdminLog(){
+  if(!adminConfigured()){ adminLogCache = []; return; }
+  adminLoading = true; adminLoadError = null;
+  try{
+    const url = `${ADMIN_SHEET_URL}?action=list&secret=${encodeURIComponent(ADMIN_PASSWORD)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error || "load_failed");
+    adminLogCache = data.rows;
+  }catch(e){
+    adminLoadError = "Couldn't load your codes. Check your internet connection.";
+  }
+  adminLoading = false;
+  render();
+}
+
+async function generateAdminCode(name){
+  if(!adminConfigured()){ showToast("Connect your Google Sheet first — see the note above."); return; }
+  adminGenerating = true; render();
+  try{
+    const url = `${ADMIN_SHEET_URL}?action=generate&secret=${encodeURIComponent(ADMIN_PASSWORD)}&name=${encodeURIComponent(name)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error || "generate_failed");
+    adminLogCache.unshift({code: data.code, name: data.name, status: "Active", createdAt: new Date().toISOString(), lastUsedAt: "", timesUsed: 0});
+    adminGenerating = false;
+    render();
+    showToast(`Code generated for ${data.name}`);
+  }catch(e){
+    adminGenerating = false;
+    render();
+    showToast("Couldn't generate a code — check your internet and try again.");
+  }
+}
+
+async function setAdminCodeStatus(code, newStatus){
+  const row = adminLogCache.find(r => r.code === code);
+  if(row) row.status = newStatus;
+  render();
+  try{
+    const action = newStatus === "Revoked" ? "revoke" : "reactivate";
+    const url = `${ADMIN_SHEET_URL}?action=${action}&secret=${encodeURIComponent(ADMIN_PASSWORD)}&code=${encodeURIComponent(code)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error || "status_failed");
+  }catch(e){
+    showToast("Updated here, but couldn't sync — check your internet.");
+  }
+}
+
+async function deleteAdminCode(code){
+  adminLogCache = adminLogCache.filter(r => r.code !== code);
+  render();
+  try{
+    const url = `${ADMIN_SHEET_URL}?action=delete&secret=${encodeURIComponent(ADMIN_PASSWORD)}&code=${encodeURIComponent(code)}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.error || "delete_failed");
+  }catch(e){
+    showToast("Deleted here, but couldn't sync — check your internet.");
+  }
+}
 
 function renderAdmin(){
   if(!adminUnlocked){
@@ -3976,40 +4040,49 @@ function renderAdmin(){
     </div>`;
   }
 
-  const log = loadAdminLog();
-  const total = CODES_POOL.length;
-  const assignedCodes = Object.keys(log);
-  const assignedCount = assignedCodes.length;
-  const availableCount = total - assignedCount;
+  if(adminLogCache === null){
+    if(!adminLoading) fetchAdminLog(); // fire off the load, will re-render when done
+    return `
+    <div class="admin-wrap"><div class="admin-shell">
+      <div class="admin-header"><h2>Admin — Access Codes</h2><a href="#" data-nav="landing">← Back to home</a></div>
+      <div class="admin-card"><div class="admin-empty">Loading your saved list…</div></div>
+    </div></div>`;
+  }
+
+  if(adminLoadError){
+    return `
+    <div class="admin-wrap"><div class="admin-shell">
+      <div class="admin-header"><h2>Admin — Access Codes</h2><a href="#" data-nav="landing">← Back to home</a></div>
+      <div class="admin-note" style="border-color:#E9A5A0;background:#FDECEC;color:#8A2E27">${adminLoadError}</div>
+      <button class="btn btn-dark" id="adminRetryBtn" style="width:auto;padding:10px 18px">Try Again</button>
+    </div></div>`;
+  }
+
+  const rows0 = adminLogCache;
+  const total = rows0.length;
+  const activeCount = rows0.filter(r => r.status !== "Revoked").length;
+  const revokedCount = total - activeCount;
 
   const q = adminSearch.trim().toLowerCase();
-  const rows = CODES_POOL
-    .map(code => ({code, name: log[code] || null}))
+  const rows = rows0
     .filter(r => !q || r.code.toLowerCase().includes(q) || (r.name||"").toLowerCase().includes(q))
-    .sort((a,b)=>{
-      // unassigned first, so the next code to hand out is easy to find
-      if(!!a.name === !!b.name) return a.code.localeCompare(b.code);
-      return a.name ? 1 : -1;
-    })
+    .sort((a,b)=> (b.createdAt||"").localeCompare(a.createdAt||"")) // newest first
     .slice(0, 60); // keep the DOM light; search narrows it down
 
   const rowsHtml = rows.map(r=>{
-    if(r.name){
-      const msg = `Hi ${r.name}, here's your MEDSTART access code: ${r.code}\n\nOpen the app, enter your name and this code under Get Access to unlock it.`;
-      const wa = `https://wa.me/?text=${encodeURIComponent(msg)}`;
-      return `
-      <div class="admin-row">
-        <div class="code">${r.code}</div>
-        <div class="who">${escapeAdminHtml(r.name)}</div>
-        <a class="row-btn send" href="${wa}" target="_blank" rel="noopener">Send</a>
-        <button class="row-btn clear" data-clear-code="${r.code}">Clear</button>
-      </div>`;
-    }
+    const revoked = r.status === "Revoked";
+    const msg = `Hi ${r.name}, here's your MEDSTART access code: ${r.code}\n\nOpen the app, enter your name and this code under Get Access to unlock it.`;
+    const wa = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+    const usedTag = r.timesUsed > 0 ? `<span style="font-size:11px;color:var(--muted);margin-left:6px">used ${r.timesUsed}×</span>` : "";
     return `
     <div class="admin-row">
       <div class="code">${r.code}</div>
-      <input type="text" class="name-input" placeholder="Buyer name…" data-name-for="${r.code}">
-      <button class="row-btn assign" data-assign-code="${r.code}">Assign</button>
+      <div class="who${revoked ? ' unassigned' : ''}">${escapeAdminHtml(r.name || "—")}${usedTag}${revoked ? ' <span style="color:#B3261E;font-weight:600">Revoked</span>' : ''}</div>
+      ${revoked
+        ? `<button class="row-btn assign" data-reactivate-code="${r.code}">Reactivate</button>`
+        : `<a class="row-btn send" href="${wa}" target="_blank" rel="noopener">Send</a>
+           <button class="row-btn clear" data-revoke-code="${r.code}">Revoke</button>`
+      }
     </div>`;
   }).join("");
 
@@ -4021,21 +4094,32 @@ function renderAdmin(){
         <a href="#" data-nav="landing">← Back to home</a>
       </div>
 
-      <div class="admin-note">This list is saved on this device/browser only. If you manage codes from your phone and your laptop, each will show its own notes — the codes themselves work everywhere either way.</div>
+      ${!adminConfigured() ? `<div class="admin-note" style="border-color:#E9C27A;background:#FFF7EA">This panel isn't connected to your Google Sheet yet. Find ADMIN_SHEET_URL near the top of the script and paste in your MedstartServer web app link.</div>` : ""}
 
-      <div class="admin-stats">
-        <div class="admin-stat"><div class="num">${total}</div><div class="lbl">Total Codes</div></div>
-        <div class="admin-stat"><div class="num">${assignedCount}</div><div class="lbl">Assigned</div></div>
-        <div class="admin-stat"><div class="num">${availableCount}</div><div class="lbl">Available</div></div>
-      </div>
-
-      <input type="text" class="admin-search" id="adminSearchInput" placeholder="Search by code or buyer name…" value="${escapeAdminHtml(adminSearch)}">
+      <div class="admin-note">Codes are checked live against your Google Sheet — nothing here can be read from the site's source code, and this list is the same on every device.</div>
 
       <div class="admin-card">
-        ${rowsHtml || `<div class="admin-empty">No codes match your search.</div>`}
+        <label style="display:block;font-size:12.5px;font-weight:600;margin-bottom:8px;color:var(--navy)">Generate a code for a new buyer</label>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="newBuyerName" placeholder="Buyer's full name…" style="flex:1;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit" ${adminGenerating ? 'disabled' : ''}>
+          <button class="row-btn assign" id="generateBtn" style="padding:0 18px" ${adminGenerating ? 'disabled' : ''}>${adminGenerating ? 'Generating…' : 'Generate'}</button>
+        </div>
       </div>
 
-      ${availableCount === 0 ? `<div class="admin-note">You've assigned every code in this batch. Come back to the conversation where this file was built and ask for another batch of codes.</div>` : ""}
+      <div class="admin-stats">
+        <div class="admin-stat"><div class="num">${total}</div><div class="lbl">Total Issued</div></div>
+        <div class="admin-stat"><div class="num">${activeCount}</div><div class="lbl">Active</div></div>
+        <div class="admin-stat"><div class="num">${revokedCount}</div><div class="lbl">Revoked</div></div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-bottom:14px">
+        <input type="text" class="admin-search" id="adminSearchInput" placeholder="Search by code or buyer name…" value="${escapeAdminHtml(adminSearch)}" style="margin-bottom:0;flex:1">
+        <button class="row-btn clear" id="adminRefreshBtn" style="white-space:nowrap;padding:0 14px">Sync Now</button>
+      </div>
+
+      <div class="admin-card">
+        ${rowsHtml || `<div class="admin-empty">${total === 0 ? 'No codes generated yet — create your first one above.' : 'No codes match your search.'}</div>`}
+      </div>
     </div>
   </div>`;
 }
@@ -4051,6 +4135,7 @@ function attachAdminHandlers(){
       const pw = document.getElementById('adminPw').value;
       if(pw === ADMIN_PASSWORD){
         adminUnlocked = true;
+        adminLogCache = null;
         render();
       }else{
         document.getElementById('adminErr').innerHTML = `<div class="err-msg">Wrong password.</div>`;
@@ -4088,29 +4173,39 @@ function attachAdminHandlers(){
     });
   }
 
-  document.querySelectorAll('[data-assign-code]').forEach(btn=>{
+  const genBtn = document.getElementById('generateBtn');
+  const nameInput = document.getElementById('newBuyerName');
+  if(genBtn && nameInput){
+    const doGenerate = ()=>{
+      const name = nameInput.value.trim();
+      if(!name){ nameInput.focus(); return; }
+      generateAdminCode(name);
+      nameInput.value = '';
+    };
+    genBtn.addEventListener('click', doGenerate);
+    nameInput.addEventListener('keydown', e=>{ if(e.key==='Enter') doGenerate(); });
+  }
+
+  document.querySelectorAll('[data-revoke-code]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      const code = btn.getAttribute('data-assign-code');
-      const input = document.querySelector(`[data-name-for="${code}"]`);
-      const name = input ? input.value.trim() : "";
-      if(!name){ input?.focus(); return; }
-      const log = loadAdminLog();
-      log[code] = name;
-      saveAdminLog(log);
-      render();
+      const code = btn.getAttribute('data-revoke-code');
+      if(!confirm(`Revoke ${code}? Whoever has this code will no longer be able to log in with it.`)) return;
+      setAdminCodeStatus(code, 'Revoked');
     });
   });
 
-  document.querySelectorAll('[data-clear-code]').forEach(btn=>{
+  document.querySelectorAll('[data-reactivate-code]').forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      const code = btn.getAttribute('data-clear-code');
-      if(!confirm(`Remove the name attached to ${code}? The code will still work for whoever has it.`)) return;
-      const log = loadAdminLog();
-      delete log[code];
-      saveAdminLog(log);
-      render();
+      const code = btn.getAttribute('data-reactivate-code');
+      setAdminCodeStatus(code, 'Active');
     });
   });
+
+  const retryBtn = document.getElementById('adminRetryBtn');
+  if(retryBtn) retryBtn.addEventListener('click', ()=>{ adminLoadError = null; adminLogCache = null; render(); });
+
+  const refreshBtn = document.getElementById('adminRefreshBtn');
+  if(refreshBtn) refreshBtn.addEventListener('click', ()=>{ adminLogCache = null; render(); });
 }
 
 
